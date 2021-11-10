@@ -1,0 +1,217 @@
+repeat wait()
+until game:IsLoaded()
+
+if game.PlaceId ~= 2753915549 then
+    game.Players.LocalPlayer:Kick("You must go to First Sea!")
+end
+
+weapon = {}
+
+for a, i in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+    table.insert(weapon, i.Name)
+end
+
+function CheckQuest()
+    local lv = game.Players.LocalPlayer.Data.Level.Value
+        if lv == 1 or lv <= 2100 then
+            Mob = "Bandit [Lv. 5]"
+            Quest = "BanditQuest1"
+            LvlQuest = 1
+            S = "StartQuest"
+            lctQuest = CFrame.new(1060.1729736328, 16.455062866211, 1547.5668945313)
+            lctRest = CFrame.new(1092.85913, 65.8897629, 1612.79529, 0.999982774, -3.47490818e-08, -0.00586987333, 3.48520111e-08, 1, 1.74323596e-08, 0.00586987333, -1.76366353e-08, 0.999982774)
+        end
+end
+
+function AutoQuest()
+    local q = game.Players.LocalPlayer.PlayerGui.Main.Quest
+        if q.Visible == false then
+                tweenService, tweenInfo = game:GetService("TweenService"), TweenInfo.new(.3,Enum.EasingStyle.Linear)
+                tween = tweenService:Create(game:GetService("Players")["LocalPlayer"].Character.HumanoidRootPart, tweenInfo, {CFrame = lctQuest})
+                tween:Play()
+                wait(1.5)
+                    local quest = {
+                        [1] = S,
+                        [2] = Quest,
+                        [3] = LvlQuest,
+                        [4] = 1
+    }
+                    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(quest))
+        end
+end
+
+function TP2()
+local mob = game:GetService("Workspace").Enemies:GetChildren()
+if game.Players.LocalPlayer.PlayerGui.Main.Quest.Visible == true then
+    pcall(function()
+    game.Players.LocalPlayer.Character.Humanoid:ChangeState(11)
+        for i, v in pairs(mob) do
+            for l, e in pairs(mob) do
+                if v.Name == Mob then
+                    if e.Name == Mob then
+                        e.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame
+                        sethiddenproperty(game.Players.LocalPlayer, "SimulationRadius", math.huge)
+                        e.HumanoidRootPart.CanCollide = false
+                        v.Humanoid.WalkSpeed = 1
+                        e.Humanoid.WalkSpeed = 1
+                        v.HumanoidRootPart.Size = Vector3.new(35,10,35)
+                        e.HumanoidRootPart.Size = Vector3.new(35,10,35)
+                            if Modes == 1 then
+                                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame * CFrame.new(0,0,20)
+                            elseif Modes == 2 then
+                                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame * CFrame.new(0,20,0)
+                            end
+                                if v.Humanoid.Health == 0 or e.Humanoid.Health == 0 then
+                                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = lctRest
+                                end
+                    end 
+                end
+            end
+        end
+    end)
+end
+end
+
+function AutoEquip()
+    if game.Players.LocalPlayer.Backpack:FindFirstChild(_G.Select_Weapon) then
+        local tool = game.Players.LocalPlayer.Backpack:FindFirstChild(_G.Select_Weapon)
+        wait(.4)
+        game.Players.LocalPlayer.Character.Humanoid:EquipTool(tool)
+    end
+end
+
+function nocamshake()
+    local cam = require(game.ReplicatedStorage.Util.CameraShaker)
+        cam:Stop()
+end
+
+function AutoClick()
+local VU = game:GetService('VirtualUser')
+local q = game.Players.LocalPlayer.PlayerGui.Main.Quest
+    if q.Visible == true then
+            VU:CaptureController()
+            VU:Button1Down(Vector2.new(1280, 672))
+    end
+end
+
+function AutoBuso()
+    if game.Players.LocalPlayer.Character:FindFirstChild("HasBuso") then
+        else
+            local args = {
+                [1] = "Buso"
+            }
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
+    end
+end
+
+function AutoStats()
+    local args = {
+        [1] = "AddPoint",
+        [2] = _G.Stats,
+        [3] = _G.PointStats
+    }
+
+    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
+end
+
+--Made by : https://v3rmillion.net/member.php?action=profile&uid=244024
+-- init
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/zxciaz/VenyxUI/main/Reuploaded"))() --someone reuploaded it so I put it in place of the original back up so guy can get free credit.
+local venyx = library.new("TNW HUB | BLOX FRUITS", 0)
+
+-- themes
+local themes = {
+Background = Color3.fromRGB(24, 24, 24),
+Glow = Color3.fromRGB(0, 0, 0),
+Accent = Color3.fromRGB(10, 10, 10),
+LightContrast = Color3.fromRGB(20, 20, 20),
+DarkContrast = Color3.fromRGB(14, 14, 14),  
+TextColor = Color3.fromRGB(255, 255, 255)
+}
+
+-- first page
+local page = venyx:addPage("Auto Farm", 0)
+local section1 = page:addSection("Main")
+section1:addToggle("Auto Farm Bones", nil, function(farm)
+    _G.AutoFarm_Bones = farm
+        CheckQuest()
+            while _G.AutoFarm_Bones do wait()
+                pcall(function()
+                    AutoBuso()
+                    AutoQuest()
+                    AutoEquip()
+                    nocamshake()
+                    TP2()
+                    AutoClick()
+                end)
+            end
+end)
+section1:addDropdown("Select Weapon", weapon, function(weapon)
+pcall(function()
+   _G.Select_Weapon = weapon
+end)
+end)
+section1:addButton("Refresh", function()
+pcall(function()
+    table.clear(weapon)
+        for a, i in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+            table.insert(weapon, i.Name)
+        end
+end)
+end)
+section1:addSlider("Modes ( 1 : Behind / 2 : Over ) ( Pick before auto farm )", 0, 1, 2, function(modes)
+    Modes = modes
+        TP2()
+end)
+
+local page2 = venyx:addPage("Fruits", 0)
+local section21 = page2:addSection("Random Fruits")
+section21:addToggle("Auto Random Fruits", nil, function(atrandomf)
+    _G.RandomF = atrandomf
+        while _G.RandomF do wait()
+            local randomf = {
+                [1] = "Cousin",
+                [2] = "Buy"
+            }
+                game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(randomf))
+        end
+end)
+section21:addButton("Random Fruit", function()
+    local randomf = {
+            [1] = "Cousin",
+            [2] = "Buy"
+        }
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(randomf))
+end)
+
+local page3 = venyx:addPage("Event", 0)
+local sectionpage31 = page3:addSection("Halloween")
+sectionpage31:addToggle("Auto Random Surprises", nil, function(hal)
+    _G.Bones = hal
+        while _G.Bones do wait()
+            local bones = {
+                [1] = "Bones",
+                [2] = "Buy",
+                [3] = 1,
+                [4] = 1
+            }
+                game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(bones))
+        end
+end)
+sectionpage31:addButton("Random Surprise", function()
+        local bones = {
+            [1] = "Bones",
+            [2] = "Buy",
+            [3] = 1,
+            [4] = 1
+        }
+        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(bones))
+end)
+
+local page5 = venyx:addPage("Settings", 0)
+local sectionpage51 = page5:addSection("Toggle Keybind")
+sectionpage51:addKeybind("Toggle Keybind", Enum.KeyCode.RightControl, function()
+    venyx:toggle()
+end, function()
+    print("Change")
+end)
